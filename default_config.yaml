@@ -1,0 +1,5 @@
+watched_key_hashes: []
+key_aliases: ""
+refresh_interval_minutes: 5
+default_view: simple
+show_token_counts: true

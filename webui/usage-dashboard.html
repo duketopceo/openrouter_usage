@@ -1,0 +1,141 @@
+<html>
+<head>
+  <title>OpenRouter Usage</title>
+  <script type="module" src="/plugins/openrouter_usage/webui/usage-store.js"></script>
+</head>
+<body>
+  <div x-data>
+    <template x-if="$store.openrouterUsageStore">
+      <div x-init="$store.openrouterUsageStore.onOpen()" x-destroy="$store.openrouterUsageStore.cleanup()">
+        <div class="header-row">
+          <div>
+            <div class="section-title">OpenRouter Usage</div>
+            <div class="subline" x-text="$store.openrouterUsageStore.asOfLabel ? `Updated ${$store.openrouterUsageStore.asOfLabel}` : ''"></div>
+          </div>
+          <div class="toggle-row">
+            <button type="button" class="btn" :class="{ active: $store.openrouterUsageStore.view === 'simple' }" @click="$store.openrouterUsageStore.setView('simple')">Simple</button>
+            <button type="button" class="btn" :class="{ active: $store.openrouterUsageStore.view === 'detailed' }" @click="$store.openrouterUsageStore.setView('detailed')">Detailed</button>
+          </div>
+        </div>
+
+        <template x-if="$store.openrouterUsageStore.emptyState === 'missing_management_key'">
+          <div class="empty">Add <code>OPENROUTER_MANAGEMENT_KEY</code> to Agent Zero Secrets, then refresh.</div>
+        </template>
+
+        <template x-if="$store.openrouterUsageStore.hasData">
+          <div class="cards">
+            <div class="card">
+              <div class="card-label">30-day spend</div>
+              <div class="card-value" x-text="$store.openrouterUsageStore.summaryLine"></div>
+              <div class="card-sub" x-text="$store.openrouterUsageStore.creditLine"></div>
+            </div>
+          </div>
+
+          <template x-if="$store.openrouterUsageStore.view === 'detailed'">
+            <div class="panel">
+              <h3>Daily spend</h3>
+              <template x-for="day in ($store.openrouterUsageStore.overview?.daily || [])" :key="day.label">
+                <div class="bar-row">
+                  <span class="bar-label" x-text="day.label"></span>
+                  <div class="bar-track">
+                    <template x-for="(value, label) in day.by_key" :key="label">
+                      <div class="bar-fill" :style="{ width: $store.openrouterUsageStore.barWidth(value, Math.max(...Object.values(day.by_key))) }" :title="`${label}: $${value}`"></div>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <h3>Spend by key</h3>
+              <template x-for="row in ($store.openrouterUsageStore.overview?.per_key || [])" :key="row.label">
+                <div class="bar-row">
+                  <span class="bar-label" x-text="row.label"></span>
+                  <div class="bar-track">
+                    <div class="bar-fill key" :style="{ width: $store.openrouterUsageStore.barWidth(row.usd, $store.openrouterUsageStore.maxBar($store.openrouterUsageStore.overview.per_key)) }"></div>
+                  </div>
+                  <span class="bar-value" x-text="row.usd?.toFixed ? (row.usd < 0.01 ? `$${row.usd.toFixed(4)}` : `$${row.usd.toFixed(2)}`) : row.usd"></span>
+                </div>
+              </template>
+
+              <h3>Top models</h3>
+              <template x-for="row in ($store.openrouterUsageStore.overview?.top_models || [])" :key="row.model">
+                <div class="bar-row">
+                  <span class="bar-label" x-text="row.model"></span>
+                  <div class="bar-track">
+                    <div class="bar-fill model" :style="{ width: $store.openrouterUsageStore.barWidth(row.usd, $store.openrouterUsageStore.maxBar($store.openrouterUsageStore.overview.top_models)) }"></div>
+                  </div>
+                </div>
+              </template>
+
+              <h3>Per-key totals</h3>
+              <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Hash</th>
+                    <th>USD</th>
+                    <th x-show="$store.openrouterUsageStore.overview?.settings?.show_token_counts">Prompt</th>
+                    <th x-show="$store.openrouterUsageStore.overview?.settings?.show_token_counts">Completion</th>
+                    <th x-show="$store.openrouterUsageStore.overview?.settings?.show_token_counts">Reasoning</th>
+                    <th>Requests</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="row in ($store.openrouterUsageStore.overview?.per_key || [])" :key="row.label">
+                    <tr>
+                      <td x-text="row.label"></td>
+                      <td x-text="row.hash_prefix"></td>
+                      <td x-text="row.usd < 0.01 ? row.usd.toFixed(4) : row.usd.toFixed(2)"></td>
+                      <td x-show="$store.openrouterUsageStore.overview?.settings?.show_token_counts" x-text="row.prompt_tokens"></td>
+                      <td x-show="$store.openrouterUsageStore.overview?.settings?.show_token_counts" x-text="row.completion_tokens"></td>
+                      <td x-show="$store.openrouterUsageStore.overview?.settings?.show_token_counts" x-text="row.reasoning_tokens"></td>
+                      <td x-text="row.requests"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+              </div>
+            </div>
+          </template>
+
+          <template x-if="$store.openrouterUsageStore.overview?.last_error">
+            <div class="warn" x-text="$store.openrouterUsageStore.overview.last_error"></div>
+          </template>
+        </template>
+      </div>
+    </template>
+  </div>
+
+  <style>
+    .header-row { display: flex; justify-content: space-between; gap: 12px; align-items: start; flex-wrap: wrap; }
+    .toggle-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn.active { outline: 2px solid var(--color-primary, #6cf); }
+    .cards { display: grid; gap: 12px; margin: 12px 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+    .card { border: 1px solid var(--color-border, #333); border-radius: 10px; padding: 12px; }
+    .card-label { opacity: 0.75; font-size: 0.8rem; }
+    .card-value { font-size: clamp(1.1rem, 4vw, 1.3rem); font-weight: 700; word-break: break-word; }
+    .panel { display: grid; gap: 8px; }
+    .bar-row { display: grid; grid-template-columns: minmax(56px, 72px) 1fr auto; gap: 8px; align-items: center; }
+    .bar-label { font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar-track { height: 10px; min-width: 0; background: color-mix(in srgb, var(--color-border) 40%, transparent); border-radius: 999px; overflow: hidden; display: flex; }
+    .bar-fill { height: 100%; background: var(--color-primary, #6cf); opacity: 0.85; min-width: 2px; }
+    .bar-fill.key { background: #7bdff9; }
+    .bar-fill.model { background: #f7b267; }
+    .bar-value { font-size: 0.75rem; white-space: nowrap; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; padding: 0 4px; }
+    .table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 0.82rem; }
+    .table th, .table td { border-bottom: 1px solid var(--color-border, #333); padding: 8px 6px; text-align: left; }
+    .empty, .warn { margin-top: 12px; padding: 10px; border-radius: 8px; background: color-mix(in srgb, var(--color-border) 25%, transparent); font-size: 0.9rem; }
+    .subline { opacity: 0.75; font-size: 0.8rem; }
+    @media (max-width: 720px) {
+      .header-row { flex-direction: column; align-items: stretch; }
+      .toggle-row { width: 100%; }
+      .toggle-row .btn { flex: 1; min-height: 44px; }
+      .bar-row { grid-template-columns: 1fr; gap: 4px; }
+      .bar-label { white-space: normal; }
+      .bar-value { justify-self: start; }
+      .card-value { font-size: 1.15rem; }
+    }
+  </style>
+</body>
+</html>

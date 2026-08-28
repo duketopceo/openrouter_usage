@@ -1,0 +1,88 @@
+<html>
+<head>
+  <title>OpenRouter Usage</title>
+  <script type="module" src="/plugins/openrouter_usage/webui/usage-store.js"></script>
+</head>
+<body>
+  <div x-data>
+    <div class="hero">
+      <img src="/plugins/openrouter_usage/docs/logo.webp" alt="OpenRouter Usage" width="56" height="56" />
+      <div>
+        <div class="section-title">OpenRouter Usage</div>
+        <div class="section-description">Track org spend and per-key activity with your management key (read-only).</div>
+      </div>
+    </div>
+
+    <p class="hint">Add <code>OPENROUTER_MANAGEMENT_KEY</code> to Agent Zero Secrets — never in this config file.</p>
+
+    <label class="field">
+      <span class="field-title">Watched key hashes</span>
+      <span class="field-description">Empty = aggregate activity only (minimal API calls).</span>
+      <div class="key-actions">
+        <button type="button" class="btn" @click="$store.openrouterUsageStore.fetchKeys()">Fetch keys</button>
+      </div>
+      <template x-if="$store.openrouterUsageStore.availableKeys.length">
+        <div class="key-list">
+          <template x-for="row in $store.openrouterUsageStore.availableKeys" :key="row.hash_prefix">
+            <label class="key-row">
+              <input type="checkbox"
+                     :checked="$store.openrouterUsageStore.isWatched(row.hash_prefix, config)"
+                     @change="$store.openrouterUsageStore.toggleWatch(row.hash_prefix, config)" />
+              <span x-text="`${row.label} (${row.hash_prefix})`"></span>
+              <span class="badge" x-show="row.disabled">disabled</span>
+            </label>
+          </template>
+        </div>
+      </template>
+    </label>
+
+    <label class="field">
+      <span class="field-title">Key aliases</span>
+      <textarea rows="3" x-model="config.key_aliases" placeholder="821713b8=luke,abc12345=helpdesk"></textarea>
+    </label>
+
+    <div class="field-grid">
+      <label class="field">
+        <span class="field-title">Refresh interval (minutes)</span>
+        <input type="number" min="1" x-model.number="config.refresh_interval_minutes" />
+      </label>
+      <label class="field">
+        <span class="field-title">Default view</span>
+        <select x-model="config.default_view">
+          <option value="simple">Simple</option>
+          <option value="detailed">Detailed</option>
+        </select>
+      </label>
+      <label class="field inline">
+        <input type="checkbox" x-model="config.show_token_counts" />
+        <span>Show token counts in detailed view</span>
+      </label>
+    </div>
+
+    <div class="actions-row">
+      <button type="button" class="btn" @click="$store.openrouterUsageStore.fetchOverview({ force: true })">Refresh now</button>
+    </div>
+  </div>
+
+  <style>
+    .hero { display: flex; gap: 14px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .hero img { border-radius: 12px; flex: none; }
+    .field { display: grid; gap: 6px; margin-top: 12px; }
+    .field input, .field textarea, .field select { min-height: 44px; font-size: 16px; }
+    .field-grid { display: grid; gap: 12px; margin-top: 12px; }
+    .field.inline { grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
+    .field-title { font-weight: 700; font-size: 0.84rem; }
+    .field-description { opacity: 0.8; font-size: 0.8rem; }
+    .hint { opacity: 0.8; font-size: 0.82rem; line-height: 1.45; }
+    .key-list { display: grid; gap: 8px; max-height: min(220px, 40vh); overflow: auto; -webkit-overflow-scrolling: touch; margin-top: 8px; }
+    .key-row { display: flex; gap: 8px; align-items: center; font-size: 0.85rem; min-height: 44px; }
+    .badge { font-size: 0.72rem; opacity: 0.7; border: 1px solid currentColor; border-radius: 999px; padding: 0 6px; }
+    .actions-row, .key-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .actions-row .btn, .key-actions .btn { min-height: 44px; flex: 1; min-width: 120px; }
+    @media (max-width: 720px) {
+      .field.inline { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</body>
+</html>

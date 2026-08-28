@@ -1,0 +1,8 @@
+name: openrouter_usage
+title: OpenRouter Usage
+description: Track OpenRouter org spend, per-key usage, models, and tokens — lightweight sidebar widget plus detailed dashboard.
+version: 1.1.0
+settings_sections:
+  - developer
+per_project_config: false
+per_agent_config: false

@@ -35,8 +35,8 @@ export function pctChange(cur, prev) {
 
 export function barPct(value, max) {
   const v = Number(value);
-  const m = Number(max) || 0;
-  if (!Number.isFinite(v) || v <= 0 || m <= 0) return "0%";
+  const m = Number(max);
+  if (!Number.isFinite(v) || !Number.isFinite(m) || v <= 0 || m <= 0) return "0%";
   return `${Math.min(100, Math.max(2, (v / m) * 100))}%`;
 }
 

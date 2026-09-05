@@ -113,7 +113,7 @@ def daily_series(
     series: list[dict[str, Any]] = []
     for day in sorted(grouped):
         label = chart_date_label(day)
-        series.append({"label": label or day, "usd": grouped[day]})
+        series.append({"day": day, "label": label or day, "usd": grouped[day]})
     return series
 
 
@@ -200,11 +200,14 @@ def per_key_from_activity(
 def daily_from_activity(activity_rows: list[Activity]) -> list[dict[str, Any]]:
     daily: dict[str, float] = defaultdict(float)
     for record in activity_rows:
-        day = chart_date_label(record.date or "")
+        day = (record.date or "")[:10]
         if not day:
             continue
         daily[day] += record.usage
-    return [{"label": day, "usd": value} for day, value in sorted(daily.items())]
+    return [
+        {"day": day, "label": chart_date_label(day) or day, "usd": value}
+        for day, value in sorted(daily.items())
+    ]
 
 
 def build_totals_from_analytics(rows: list[AnalyticsRow]) -> dict[str, Any]:

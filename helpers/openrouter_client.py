@@ -544,5 +544,8 @@ def fetch_budgets(agent: Any = None, workspace_id: str | None = None, interval: 
     return {"ok": True, "budgets": [b.to_dict() for b in budgets]}
 
 
-def invalidate_cache() -> None:
-    _OVERVIEW_CACHE.clear()
+def invalidate_cache(workspace_id: str | None = None) -> None:
+    if workspace_id:
+        _OVERVIEW_CACHE.clear(workspace_id)
+    else:
+        _OVERVIEW_CACHE.clear()

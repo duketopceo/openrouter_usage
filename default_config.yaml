@@ -3,3 +3,7 @@ key_aliases: ""
 refresh_interval_minutes: 5
 default_view: simple
 show_token_counts: true
+history_days: 90
+budget_alert_threshold: 0.8
+burn_window_days: 30
+pinned_workspace_id: ""

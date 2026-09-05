@@ -1,0 +1,25 @@
+[
+  {
+    "date": "2026-09-01",
+    "model_permaslug": "openai/gpt-4o",
+    "model": "openai/gpt-4o",
+    "endpoint_id": "chat",
+    "usage": 1.23,
+    "requests": 10,
+    "prompt_tokens": 1000,
+    "completion_tokens": 500,
+    "reasoning_tokens": 0,
+    "provider_name": "OpenAI"
+  },
+  {
+    "date": "2026-09-02",
+    "model_permaslug": "anthropic/claude-3.5-sonnet",
+    "model": "anthropic/claude-3.5-sonnet",
+    "endpoint_id": "chat",
+    "usage": 2.34,
+    "requests": 8,
+    "prompt_tokens": 2000,
+    "completion_tokens": 800,
+    "provider_name": "Anthropic"
+  }
+]

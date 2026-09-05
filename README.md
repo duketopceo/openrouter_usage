@@ -4,9 +4,9 @@
 
 # OpenRouter Usage
 
-**Org spend at a glance — native to Agent Zero.**
+**Org spend, workspace-aware analytics, and routing recommendations — native to Agent Zero.**
 
-A minimal sidebar widget and detailed dashboard powered by your OpenRouter **management key**. Read-only. No extra dependencies.
+A quick-view/detailed dashboard powered by your OpenRouter **management key**. Discovers workspaces, queries the OpenRouter Analytics API, caches history locally, and recommends per-workspace routing defaults. Read-only by default; routing changes require explicit confirmation.
 
 ---
 
@@ -14,10 +14,10 @@ A minimal sidebar widget and detailed dashboard powered by your OpenRouter **man
 
 | View | Shows |
 |------|-------|
-| **Widget** | 30-day spend, credit balance, top keys |
-| **Detailed** | Daily spend, per-key bars, top models, token table |
+| **Quick** | 30-day spend, credit balance, spend today, top model/key, active workspace |
+| **Detailed** | Tabs for spend, models, providers, apps, keys, workspaces, activity, budgets, and the OpenRouter Routing harness (ORI) |
 
-Data path: `credits` + `keys` + per-key `activity` (when keys are watched).
+Data path: `workspaces` + `credits` + `keys` + `activity` + `analytics/query` (primary) with a local SQLite cache for historical data.
 
 ---
 
@@ -41,17 +41,21 @@ OPENROUTER_MANAGEMENT_KEY=sk-or-mgmt-...
 
 ### 2. Settings → Developer
 
-1. **Fetch keys** → check keys to watch (empty = aggregate activity only)
-2. Set aliases: `821713b8=luke,abc12345=helpdesk`
-3. Adjust refresh interval (default 5 min)
+1. **Load workspaces** → pin a default workspace (optional)
+2. **Fetch keys** → check keys to watch (empty = aggregate activity only)
+3. Set aliases: `821713b8=luke,abc12345=helpdesk`
+4. Adjust refresh interval, history days, burn window, and budget alert threshold
 
 ---
 
 ## Design
 
 - **Server-side only** — management key never reaches the browser
-- **TTL cache** — one compact JSON blob per refresh cycle
-- **Graceful degradation** — partial data if one key's activity fails
+- **Workspace-scoped** — discovers and selects workspaces; all usage queries respect the selection
+- **Analytics-first** — uses OpenRouter `/analytics/query` with `credits`, `keys`, `activity`, and `budgets` as supplements
+- **Local history** — SQLite cache at `~/.local/share/openrouter_usage/usage.db` extends the API window
+- **Routing harness (ORI)** — recommends per-workspace defaults and applies only after explicit confirmation
+- **Graceful degradation** — partial data and stale flags if a scoped query fails
 - **Non-blocking** — widget shows stale/error state; Agent Zero still starts
 
 ---
@@ -59,9 +63,10 @@ OPENROUTER_MANAGEMENT_KEY=sk-or-mgmt-...
 ## Manual checklist
 
 - [ ] Missing key → clear empty state
-- [ ] With key → widget shows spend + balance
-- [ ] Watched keys → per-key charts populate
-- [ ] Detailed view tables and bars render
+- [ ] With key → quick view shows spend, balance, top model/key, and active workspace
+- [ ] Detailed view → tabs load models, providers, apps, keys, workspaces, activity, budgets, and routing
+- [ ] Workspace selector switches scope and refreshes data
+- [ ] Routing harness shows current vs recommended defaults and requires confirmation to apply
 
 ---
 

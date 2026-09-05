@@ -1,0 +1,24 @@
+[
+  {
+    "id": "ws_1",
+    "slug": "default",
+    "name": "Default Workspace",
+    "default_text_model": "openai/gpt-4o",
+    "default_image_model": "openai/dall-e-3",
+    "default_provider_sort": ["OpenAI", "Anthropic"],
+    "is_observability_io_logging_enabled": true,
+    "is_observability_broadcast_enabled": false,
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-09-01T00:00:00Z"
+  },
+  {
+    "id": "ws_2",
+    "slug": "secondary",
+    "name": "Secondary Workspace",
+    "default_text_model": "anthropic/claude-3.5-sonnet",
+    "default_image_model": null,
+    "default_provider_sort": ["Anthropic", "OpenAI"],
+    "is_data_discount_logging_enabled": true,
+    "include_byok_in_budgets": true
+  }
+]

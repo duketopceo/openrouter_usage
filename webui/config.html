@@ -4,12 +4,12 @@
   <script type="module" src="/plugins/openrouter_usage/webui/usage-store.js"></script>
 </head>
 <body>
-  <div x-data>
+  <div x-data x-init="$store.openrouterUsageStore.fetchWorkspaces()">
     <div class="hero">
       <img src="/plugins/openrouter_usage/docs/logo.webp" alt="OpenRouter Usage" width="56" height="56" />
       <div>
         <div class="section-title">OpenRouter Usage</div>
-        <div class="section-description">Track org spend and per-key activity with your management key (read-only).</div>
+        <div class="section-description">Track OpenRouter org spend, per-key usage, models, providers, workspaces, and routing recommendations.</div>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
       <textarea rows="3" x-model="config.key_aliases" placeholder="821713b8=luke,abc12345=helpdesk"></textarea>
     </label>
 
-    <div class="field-grid">
+    <div class="field-grid three">
       <label class="field">
         <span class="field-title">Refresh interval (minutes)</span>
         <input type="number" min="1" x-model.number="config.refresh_interval_minutes" />
@@ -59,6 +59,35 @@
       </label>
     </div>
 
+    <div class="field-grid three">
+      <label class="field">
+        <span class="field-title">History days</span>
+        <input type="number" min="1" x-model.number="config.history_days" />
+      </label>
+      <label class="field">
+        <span class="field-title">Burn window (days)</span>
+        <input type="number" min="1" x-model.number="config.burn_window_days" />
+      </label>
+      <label class="field">
+        <span class="field-title">Budget alert threshold</span>
+        <input type="number" min="0" max="1" step="0.05" x-model.number="config.budget_alert_threshold" />
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field-title">Pinned workspace</span>
+      <span class="field-description">Default workspace to load in the dashboard. Leave empty to use the first workspace.</span>
+      <div class="key-actions">
+        <button type="button" class="btn" @click="$store.openrouterUsageStore.fetchWorkspaces()">Load workspaces</button>
+      </div>
+      <select x-model="config.pinned_workspace_id">
+        <option value="">Current / no pin</option>
+        <template x-for="ws in $store.openrouterUsageStore.workspaces" :key="ws.id">
+          <option :value="ws.id" x-text="ws.name || ws.id"></option>
+        </template>
+      </select>
+    </label>
+
     <div class="actions-row">
       <button type="button" class="btn" @click="$store.openrouterUsageStore.fetchOverview({ force: true })">Refresh now</button>
     </div>
@@ -70,6 +99,7 @@
     .field { display: grid; gap: 6px; margin-top: 12px; }
     .field input, .field textarea, .field select { min-height: 44px; font-size: 16px; }
     .field-grid { display: grid; gap: 12px; margin-top: 12px; }
+    .field-grid.three { grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); }
     .field.inline { grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
     .field-title { font-weight: 700; font-size: 0.84rem; }
     .field-description { opacity: 0.8; font-size: 0.8rem; }
@@ -81,6 +111,7 @@
     .actions-row .btn, .key-actions .btn { min-height: 44px; flex: 1; min-width: 120px; }
     @media (max-width: 720px) {
       .field.inline { grid-template-columns: 1fr; }
+      .field-grid.three { grid-template-columns: 1fr; }
       .hero { flex-direction: column; align-items: flex-start; }
     }
   </style>

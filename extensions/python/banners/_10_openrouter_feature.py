@@ -15,7 +15,7 @@ class OpenRouterFeatureCard(Extension):
                 "type": "feature",
                 "priority": 41,
                 "title": "OpenRouter Usage",
-                "description": "Track org spend, per-key usage, and top models with a lightweight sidebar widget.",
+                "description": "Track workspace spend, model usage, provider latency, and routing recommendations with your management key.",
                 "thumbnail": "/plugins/openrouter_usage/docs/logo.webp",
                 "icon": "monitoring",
                 "cta_text": "Add management key",

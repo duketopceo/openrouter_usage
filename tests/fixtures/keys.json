@@ -1,0 +1,26 @@
+[
+  {
+    "hash": "abc123def4567890",
+    "name": "Luke Agent",
+    "label": "luke",
+    "disabled": false,
+    "limit": 100.0,
+    "limit_remaining": 73.5,
+    "limit_reset": "daily",
+    "usage": 12.34,
+    "usage_daily": 1.5,
+    "usage_weekly": 5.5,
+    "usage_monthly": 12.34,
+    "byok_usage": 0.0,
+    "workspace_id": "ws_1"
+  },
+  {
+    "hash": "fedcba0987654321",
+    "name": "Helpdesk",
+    "label": "",
+    "disabled": false,
+    "limit": null,
+    "usage": 0.0,
+    "workspace_id": "ws_2"
+  }
+]

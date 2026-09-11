@@ -6,30 +6,24 @@
   <template x-if="$store.openrouterUsageStore">
     <button type="button"
             class="config-button or-usage-widget"
-            title="OpenRouter usage"
+            :title="`OpenRouter usage — ${$store.openrouterUsageStore.summaryLine}${$store.openrouterUsageStore.stale ? ' (stale)' : ''}`"
             @click="openModal('/plugins/openrouter_usage/webui/usage-dashboard.html')">
       <img class="or-logo" src="/plugins/openrouter_usage/docs/logo.webp" alt="" width="18" height="18" />
       <span class="or-usage-label" x-text="$store.openrouterUsageStore.widgetLabel"></span>
+      <span class="or-stale" x-show="$store.openrouterUsageStore.stale"></span>
     </button>
   </template>
 </div>
 
 <style>
   .or-usage-widget {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    max-width: 11rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.72rem;
-    min-height: 44px;
-    min-width: 44px;
-    padding: 0 6px;
+    display: inline-flex; align-items: center; gap: 6px;
+    max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: 0.72rem; min-height: 44px; min-width: 44px; padding: 0 6px;
   }
   .or-logo { border-radius: 4px; flex: none; width: 18px; height: 18px; }
-  .or-usage-label { pointer-events: none; }
+  .or-usage-label { pointer-events: none; font-variant-numeric: tabular-nums; }
+  .or-stale { width: 6px; height: 6px; border-radius: 50%; background: #f7b955; flex: none; }
   @media (max-width: 720px) {
     .or-usage-widget { max-width: 44px; padding: 0 4px; justify-content: center; }
     .or-usage-label { display: none; }

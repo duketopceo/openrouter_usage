@@ -12,15 +12,16 @@ class Routing(ApiHandler):
             agent = None
 
         # callJsonApi uses POST for all plugin API calls, so we distinguish by payload.
-        wants_apply = bool(input.get("confirmed")) or input.get("defaults") is not None
+        confirmed = input.get("confirmed")
+        wants_apply = confirmed is not None or input.get("defaults") is not None
         if wants_apply:
-            if not input.get("confirmed"):
-                return {"ok": False, "error": "confirmed: true is required to apply routing changes"}
+            if confirmed is not True:
+                return {"ok": False, "error": "confirmed: true (boolean) is required to apply routing changes"}
             return apply_routing(
                 agent,
                 workspace_id=workspace_id,
                 defaults=input.get("defaults") or {},
-                confirmed=bool(input.get("confirmed")),
+                confirmed=True,
             )
 
         return fetch_routing(agent, workspace_id=workspace_id)

@@ -8,6 +8,7 @@ import sqlite3
 import tempfile
 import unittest
 import urllib.error
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -225,12 +226,13 @@ class TestDatabase(unittest.TestCase):
             start_time="2025-01-01T00:00:00Z",
             end_time="2025-01-01T23:59:59Z",
         )
+        recent_start = datetime.now(timezone.utc) - timedelta(days=7)
         recent = models.AnalyticsRow(
             dimensions={"model": "recent"},
             metrics={"total_usage": 2.0},
             workspace_id="ws",
-            start_time="2026-09-01T00:00:00Z",
-            end_time="2026-09-01T23:59:59Z",
+            start_time=recent_start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            end_time=recent_start.strftime("%Y-%m-%dT23:59:59Z"),
         )
         self.db.upsert([old, recent])
         deleted = self.db.prune(history_days=90)

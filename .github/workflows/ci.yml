@@ -24,5 +24,6 @@ jobs:
           python-version: "3.x"
       - name: Test
         run: |
+          set -o pipefail
           python3 -m unittest discover -s tests -t . -v 2>&1 | tee test-output.log
           grep -Eq "Ran [1-9][0-9]* tests" test-output.log

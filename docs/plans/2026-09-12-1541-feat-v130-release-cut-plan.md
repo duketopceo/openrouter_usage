@@ -142,10 +142,11 @@ U1 (test fix) → U2 (CI) → U3 (changelog) → U4 (tag + release + branch clea
 **Files:** none (git refs + GitHub release only)
 
 **Approach:**
-1. On post-merge `main`: create annotated tag `v1.3.0` (message `v1.3.0`), then `git push origin v1.3.0` — the tag must exist on the remote before the release is created or `gh` mints a lightweight tag instead.
-2. `gh release create v1.3.0` with notes from the changelog section.
-3. Content-check then delete: `git diff origin/feat/ultimate f51e20d` empty AND `git diff main origin/sync/ui-overhaul` empty, then `git push origin --delete feat/ultimate sync/ui-overhaul`. A non-empty diff stops the deletion — surface it instead of forcing.
-4. Delete local stale branches if present; `git fetch --prune` to settle remote-tracking refs.
+1. On post-merge `main`: replace `## [1.3.0] - Unreleased` in `CHANGELOG.md` with the actual release date and commit it — the tag must carry the dated entry.
+2. Create annotated tag `v1.3.0` (message `v1.3.0`), then `git push origin v1.3.0` — the tag must exist on the remote before the release is created or `gh` mints a lightweight tag instead.
+3. `gh release create v1.3.0` with notes from the changelog section.
+4. Content-check then delete: `git diff origin/feat/ultimate f51e20d` empty AND `git diff main origin/sync/ui-overhaul` empty, then `git push origin --delete feat/ultimate sync/ui-overhaul`. A non-empty diff stops the deletion — surface it instead of forcing.
+5. Delete local stale branches if present; `git fetch --prune` to settle remote-tracking refs.
 
 **Test expectation: none** — release mechanics.
 

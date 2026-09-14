@@ -4,6 +4,10 @@
 
 # OpenRouter Usage
 
+<p align="center">
+  <img src="docs/social.png" alt="OpenRouter Usage" width="640" />
+</p>
+
 **Org spend, workspace-aware analytics, and routing recommendations — native to Agent Zero.**
 
 A quick-view/detailed dashboard powered by your OpenRouter **management key**. Discovers workspaces, queries the OpenRouter Analytics API, caches history locally, and recommends per-workspace routing defaults. Read-only by default; routing changes require explicit confirmation.

@@ -240,6 +240,47 @@ class TestDatabase(unittest.TestCase):
         remaining = self.db.merge_metrics(self.db.query(workspace_id="ws"))
         self.assertEqual([r.dimension("model") for r in remaining], ["recent"])
 
+    def test_query_start_time_boundary_z_suffix(self):
+        # A `Z`-suffixed row inside the cutoff's second must not satisfy
+        # `start_time >= cutoff` when its instant precedes the cutoff.
+        row = models.AnalyticsRow(
+            dimensions={"model": "z"},
+            metrics={"total_usage": 1.0},
+            workspace_id="ws",
+            start_time="2026-09-14T10:00:00Z",
+            end_time="2026-09-14T10:59:59Z",
+        )
+        self.db.upsert([row])
+        cutoff = "2026-09-14T10:00:00.500000+00:00"
+        results = self.db.query(workspace_id="ws", start_time=cutoff)
+        self.assertEqual(results, [])
+
+    def test_prune_boundary_z_suffix(self):
+        # Same boundary class on the delete path: a `Z` row earlier than the
+        # cutoff instant must be pruned, not kept.
+        row = models.AnalyticsRow(
+            dimensions={"model": "z"},
+            metrics={"total_usage": 1.0},
+            workspace_id="ws",
+            start_time="2026-09-14T10:00:00Z",
+            end_time="2026-09-14T10:59:59Z",
+        )
+        self.db.upsert([row])
+        fixed = datetime(2026, 9, 14, 10, 0, 0, 500000, tzinfo=timezone.utc)
+
+        class _FixedDatetime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return fixed
+
+        with patch(
+            "usr.plugins.openrouter_usage.engine.db.datetime", _FixedDatetime
+        ):
+            deleted = self.db.prune(history_days=0)
+        self.assertGreaterEqual(deleted, 1)
+        remaining = self.db.merge_metrics(self.db.query(workspace_id="ws"))
+        self.assertEqual(remaining, [])
+
 
 class TestBudgets(unittest.TestCase):
     def test_project_burn_alert(self):

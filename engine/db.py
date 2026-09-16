@@ -12,9 +12,29 @@ from typing import Any, Iterable
 from .models import AnalyticsRow
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 DEFAULT_DB_DIR = Path.home() / ".local" / "share" / "openrouter_usage"
 DEFAULT_DB_PATH = DEFAULT_DB_DIR / "usage.db"
+
+
+def _canon_ts(value: str | None) -> str | None:
+    """Normalize an ISO-8601 timestamp to UTC `+00:00` with microseconds.
+
+    Stored rows mix API-style `Z` suffixes with local `+00:00` values, and
+    fraction width varies; SQLite compares these columns lexically, so a `Z`
+    row inside a cutoff's second sorts above every `+00:00` boundary value
+    and leaks through range/prune comparisons. Unparseable values pass
+    through unchanged rather than breaking the row.
+    """
+    if value is None:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+    except ValueError:
+        return value
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc).isoformat(timespec="microseconds")
 
 
 @dataclass
@@ -74,18 +94,28 @@ class UsageDb:
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_analytics_time ON analytics_cache(start_time, end_time)"
         )
+        # v1 -> v2: rewrite `Z`-suffixed timestamps to `+00:00` so lexical
+        # comparisons against local cutoffs are chronologically correct.
+        cur.execute("SELECT version FROM _version")
+        if cur.fetchone()[0] < 2:
+            for col in ("start_time", "end_time", "as_of"):
+                cur.execute(
+                    f"UPDATE analytics_cache SET {col} = REPLACE({col}, 'Z', '+00:00') WHERE {col} LIKE '%Z'"
+                )
+            cur.execute("DELETE FROM _version")
+            cur.execute("INSERT INTO _version (version) VALUES (2)")
         conn.commit()
 
     def upsert(self, rows: Iterable[AnalyticsRow]) -> None:
         conn = self._connect()
         cur = conn.cursor()
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(timezone.utc).isoformat(timespec="microseconds")
         for row in rows:
-            as_of = row.as_of or now
+            as_of = _canon_ts(row.as_of) or now
             dim_json = row.dimension_json()
             ws = row.workspace_id
-            st = row.start_time
-            et = row.end_time
+            st = _canon_ts(row.start_time)
+            et = _canon_ts(row.end_time)
             for metric, value in row.metrics.items():
                 cur.execute(
                     """
@@ -117,10 +147,10 @@ class UsageDb:
 
         if start_time is not None:
             clauses.append("(start_time >= ? OR start_time IS NULL)")
-            params.append(start_time)
+            params.append(_canon_ts(start_time))
         if end_time is not None:
             clauses.append("(end_time <= ? OR end_time IS NULL)")
-            params.append(end_time)
+            params.append(_canon_ts(end_time))
         if metric is not None:
             clauses.append("metric = ?")
             params.append(metric)
@@ -169,7 +199,9 @@ class UsageDb:
 
     def prune(self, history_days: int | None = None) -> int:
         days = history_days if history_days is not None else self.config.history_days
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+        cutoff = _canon_ts(
+            (datetime.now(timezone.utc) - timedelta(days=days)).isoformat(timespec="microseconds")
+        )
         conn = self._connect()
         cur = conn.cursor()
         cur.execute(

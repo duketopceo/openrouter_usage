@@ -52,9 +52,10 @@ modules.
 
 ## Invariants
 
-- **The management key never reaches the browser.** It is used server-side in
-  `engine/` only. `webui/ui.js` talks to the A0 API, never to OpenRouter
-  directly.
+- **The management key never reaches the browser.** It is read server-side by
+  `engine/` and `helpers/` code only — `webui/ui.js` and the `extensions/webui/`
+  injection points talk to the A0 API, never to OpenRouter directly. Keep any
+  new key handling on that side of the line.
 - **The routing harness only applies after explicit confirmation.** It
   recommends per-workspace defaults; it must never auto-apply.
 - **Every path degrades gracefully.** A failed or partial scoped query yields

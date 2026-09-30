@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# codebase-memory-mcp local index cache
+.codebase-memory/

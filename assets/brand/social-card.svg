@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="OpenRouter Usage: org spend and routing, inside Agent Zero">
+  <rect width="1280" height="640" fill="#14130F"/>
+  <rect x="24" y="24" width="1232" height="592" rx="20" fill="none" stroke="#3A372E"/>
+  <g transform="translate(88 150) scale(2.6)">
+    <rect width="64" height="64" rx="14" fill="#1F1D17"/>
+    <path d="M16.44 47.56A22 22 0 1 1 47.56 47.56" fill="none" stroke="#ECE8DF" stroke-width="6" stroke-linecap="round"/>
+    <path d="M32 32L43 19" fill="none" stroke="#E8A063" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="32" cy="32" r="4.5" fill="#ECE8DF"/>
+  </g>
+  <text x="300" y="215" font-family="'JetBrains Mono','Noto Sans Mono',monospace" font-size="64" font-weight="700" fill="#ECE8DF">openrouter<tspan fill="#E8A063">_usage</tspan></text>
+  <text x="300" y="285" font-family="'JetBrains Mono','Noto Sans Mono',monospace" font-size="28" fill="#A8A294">Org spend, workspace analytics and routing</text>
+  <text x="300" y="325" font-family="'JetBrains Mono','Noto Sans Mono',monospace" font-size="28" fill="#A8A294">recommendations, native to Agent Zero.</text>
+  <rect x="88" y="470" width="1104" height="90" rx="12" fill="#1F1D17" stroke="#3A372E"/>
+  <text x="120" y="526" font-family="'JetBrains Mono','Noto Sans Mono',monospace" font-size="28" fill="#A8A294">spend 30d <tspan fill="#ECE8DF">$—</tspan>   balance <tspan fill="#ECE8DF">$—</tspan>   today <tspan fill="#E8A063">$—</tspan></text>
+  <text x="88" y="90" font-family="'JetBrains Mono','Noto Sans Mono',monospace" font-size="26" fill="#A8A294">github.com/duketopceo/<tspan fill="#ECE8DF">openrouter_usage</tspan></text>
+</svg>

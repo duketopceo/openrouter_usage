@@ -1,14 +1,16 @@
 <p align="center">
-  <img src="docs/logo.webp" alt="OpenRouter Usage" width="120" />
+  <img src="assets/brand/wordmark.svg" alt="OpenRouter Usage" width="320" />
 </p>
-
-# OpenRouter Usage
 
 <p align="center">
-  <img src="docs/social.png" alt="OpenRouter Usage" width="640" />
+  <img src="assets/brand/social-card.png" alt="OpenRouter Usage social card" width="640" />
 </p>
 
-**Org spend, workspace-aware analytics, and routing recommendations — native to Agent Zero.**
+**Org spend, workspace-aware analytics, and routing recommendations, native to Agent Zero.**
+
+<p align="center"><a href="ROADMAP.md">Roadmap</a> · <a href="DESIGN.md">Design</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="docs/research/2026-10-10-landscape.md">Landscape</a></p>
+
+> Screenshot: TODO. The dashboard needs a running Agent Zero and a live OpenRouter management key, so no capture is committed yet. The social card above uses placeholder values.
 
 A quick-view/detailed dashboard powered by your OpenRouter **management key**. Discovers workspaces, queries the OpenRouter Analytics API, caches history locally, and recommends per-workspace routing defaults. Read-only by default; routing changes require explicit confirmation.
 
@@ -52,6 +54,17 @@ OPENROUTER_MANAGEMENT_KEY=sk-or-mgmt-...
 
 ---
 
+## How it works
+
+```mermaid
+flowchart LR
+  UI[Agent Zero UI] -->|plugin API| A[api/*.py]
+  A --> C[helpers/openrouter_client.py]
+  C --> E[engine: fetch, analytics, budgets, recommender]
+  E -->|management key, server-side| OR[(OpenRouter API)]
+  E <--> DB[(SQLite history cache)]
+```
+
 ## Design
 
 - **Server-side only** — management key never reaches the browser
@@ -73,6 +86,14 @@ OPENROUTER_MANAGEMENT_KEY=sk-or-mgmt-...
 - [ ] Routing harness shows current vs recommended defaults and requires confirmation to apply
 
 ---
+
+## Status
+
+v1.3.0 shipped. Next work is in [ROADMAP.md](ROADMAP.md).
+
+## Contributing
+
+Run the tests with `python3 -m unittest discover -s tests -t .` (stdlib only, no network). See `AGENTS.md`. Logos are proposals until the owner signs off.
 
 ## License
 
